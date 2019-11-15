@@ -1,0 +1,21 @@
+version: "2.1"
+
+services:
+  a9s-postgresql-app:
+    image: anynines/a9s-postgresql-app
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - 3000:3000
+    environment:
+      POSTGRESQL_HOST: postgres
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: anynines
+      POSTGRESQL_DATABASE: demo
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: anynines
+      POSTGRES_DB: demo

@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: a9s-postgresql-demo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: a9s-postgresql-demo
+        tier: frontend
+    spec:
+      containers:
+        - name: a9s-postgresql-demo
+          image: mycluster.icp:8500/a9s-ds/a9s-postgresql-demo:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: "POSTGRESQL_HOST"
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-binding
+                  key: host
+            - name: "POSTGRESQL_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-binding
+                  key: password
+            - name: "POSTGRESQL_PORT"
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-binding
+                  key: port
+            - name: "POSTGRESQL_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-binding
+                  key: user
+            - name: "POSTGRESQL_DATABASE"
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-binding
+                  key: name

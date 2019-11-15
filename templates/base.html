@@ -1,0 +1,23 @@
+{{define "base"}}
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    {{template "title" .}}
+    <link rel="stylesheet" media="all" href="/public/style.css">
+  </head>
+  <body>
+    <div class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <a class="navbar-brand" href="/"><img alt="anynines logo" height="60" src="/public/anynines.svg"></a>
+      </div>
+    </div>
+
+
+    {{template "body" .}}
+
+    <div class="footer">
+      <div class="container">
+        <span>© 2018 <a href="https://enterprise.anynines.com/">anynines enterprise</a></span>
+      </div>
+    </div>
+  </body>
+</html>
+{{end}}
