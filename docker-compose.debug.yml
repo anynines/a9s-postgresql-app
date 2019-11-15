@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
   a9s-postgresql-app:
-    image: anynines/a9s-postgresql-app
+    image: anyninesgmbh/a9s-postgresql-app
     build:
       context: .
       dockerfile: Dockerfile
