@@ -56,7 +56,7 @@ func initDatabase() {
 	}
 	defer client.Close()
 
-	client.Exec("CREATE TABLE posts(id SERIAL, title varchar(32), description varchar(128))")
+	client.Exec("CREATE TABLE posts(id SERIAL, title varchar(256), description varchar(1024))")
 }
 
 func createCredentials() (PostgresqlCredentials, error) {
