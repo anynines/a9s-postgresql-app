@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
         - name: a9s-postgresql-demo
-          image: mycluster.icp:8500/a9s-ds/a9s-postgresql-demo:latest
+          image: anyninesgmbh/a9s-postgresql-app:latest
           ports:
             - containerPort: 3000
           env:
