@@ -148,6 +148,18 @@ func NewClient() (*sql.DB, error) {
 	return client, err
 }
 
+func clearDatabase(w http.ResponseWriter, r *http.Request) {
+	client, err := NewClient()
+	defer client.Close()
+	if err != nil {
+		log.Printf("Failed to create connection: %v", err)
+		return
+	}
+
+	client.QueryRow(`DELETE FROM posts`)
+	w.Write([]byte("OK"))
+}
+
 // create new Blog post
 func createBlogPost(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -232,6 +244,7 @@ func main() {
 	http.HandleFunc("/", renderBlogPosts)
 	http.HandleFunc("/blog-posts/new", newBlogPost)
 	http.HandleFunc("/blog-posts/create", createBlogPost)
+	http.HandleFunc("/clear", clearDatabase)
 
 	log.Printf("Listening on :%v\n", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
