@@ -18,6 +18,7 @@ import (
 type PostgresqlCredentials struct {
 	Host     string `json:"host"`
 	Username string `json:"username"`
+	Sslmode  string `json:"sslmode"`
 	Password string `json:"password"`
 	Port     int    `json:"port"`
 	Database string `json:"name"`
@@ -92,6 +93,11 @@ func createCredentials() (PostgresqlCredentials, error) {
 			log.Println(err)
 			return PostgresqlCredentials{}, err
 		}
+		sslmode := os.Getenv("POSTGRESQL_SSLMODE")
+		if len(sslmode) < 1 {
+			log.Println("Environment variable POSTGRESQL_SSLMODE missing. Using default of disabled")
+			sslmode = "disable"
+		}
 
 		port, err := strconv.Atoi(portStr)
 		if err != nil {
@@ -102,6 +108,7 @@ func createCredentials() (PostgresqlCredentials, error) {
 		credentials := PostgresqlCredentials{
 			Host:     host,
 			Username: username,
+			Sslmode:  sslmode,
 			Password: password,
 			Port:     port,
 			Database: database,
@@ -136,7 +143,7 @@ func NewClient() (*sql.DB, error) {
 		return nil, err
 	}
 
-	connStr := "user=" + credentials.Username + " dbname=" + credentials.Database + " password=" + credentials.Password + " host=" + credentials.Host + " port=" + strconv.Itoa(credentials.Port) + " sslmode=disable"
+	connStr := "user=" + credentials.Username + " dbname=" + credentials.Database + " password=" + credentials.Password + " host=" + credentials.Host + " port=" + strconv.Itoa(credentials.Port) + " sslmode=" + credentials.Sslmode
 	credentials.Password = "******"
 	log.Printf("Connection to:\n%v\n", credentials)
 
