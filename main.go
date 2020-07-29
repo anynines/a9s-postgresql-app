@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
-	"path/filepath"
 	"strconv"
 
 	_ "github.com/lib/pq"
@@ -234,20 +232,8 @@ func main() {
 		port = "3000"
 	}
 
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-	if os.Getenv("VCAP_SERVICES") == "" {
-		dir, err = filepath.Abs("/app")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	log.Printf("Public dir: %v\n", dir)
+	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
 
-	fs := http.FileServer(http.Dir(path.Join(dir, "public")))
-	http.Handle("/public/", http.StripPrefix("/public/", fs))
 	http.HandleFunc("/", renderBlogPosts)
 	http.HandleFunc("/blog-posts/new", newBlogPost)
 	http.HandleFunc("/blog-posts/create", createBlogPost)
