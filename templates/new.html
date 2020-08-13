@@ -1,29 +1,49 @@
 {{define "title"}}<title>PostgreSQL Demo</title>{{end}}
 {{define "body"}}
 
-<div class="container content">
-	<div class="row">
-		<div class="col-lg-9">
-			<div class="page-header">
-				<h1>Create Blog Post</h1>
-			</div>
-      <form class="form-horizontal post" id="new_post" action="/blog-posts/create" method="post">
-        <p>Title:<br>
-            <input type="text" name="title"/>
-        </p>
-        <p>Description:<br>
-            <input type="text" name="description"/>
-        </p>
-        <p>
-            <input type="submit" value="Submit"/>
-            <div class='actions rAlign'>
-              <a href="/">Cancel</a>
-            </div>
-        </p>
-      </form>
-		</div> <!-- col-lg-9 -->
-	</div><!--/row-->
-</div> <!-- /container -->
+<div class="page__container">
+
+  <div class="page__header">
+    <h1>Create Blog Post</h1>
+  </div>
+
+  <form 
+    class="form post" 
+    id="new_post" 
+    action="/blog-posts/create" 
+    method="post"
+  >
+
+    <div class="field">
+      <span class="label">Title</span>
+      <input 
+        type="text" 
+        name="title" 
+        placeholder="Enter your title here"
+      />
+    </div>
+
+    <div class="field">
+      <span class="label">Description</span>
+      <input 
+        type="text" 
+        name="description" 
+        placeholder="Enter your post body here"
+      />
+    </div>
+
+    <div class="actions"> 
+      <a class="btn" href="/" >Cancel</a>
+      <input 
+        class="btn btn-primary" 
+        type="submit" 
+        value="Create Post"
+      />
+    </div>
+
+  </form>
+
+</div>
 
 
 {{end}}

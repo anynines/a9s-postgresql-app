@@ -6,26 +6,28 @@
     <link rel="stylesheet" media="all" href="/public/style.css" />
   </head>
   <body>
-    <div class="navbar navbar-default navbar-static-top">
+    <div class="navbar">
       <div class="container">
-        <a class="navbar-brand" href="/"
-          ><img alt="anynines logo" height="60" src="/public/anynines.svg"
-        /></a>
+        <a class="navbar-brand" href="/">
+          <img 
+          alt="anynines logo" 
+          class="logo" 
+          height="40" 
+          src="/public/logo.svg" />
+        </a>
       </div>
     </div>
 
-    {{template "body" .}}
+    <div class="page">
+      {{template "body" .}}
+    </div>
 
     <div class="footer">
-      <div class="container">
-        <span
-          >© 2020
-          <a href="https://www.anynines.com/"
-            >anynines GmbH</a
-          ></span
-        >
+        <span>
+          © 2020
+          <a target="_blank" href="https://www.anynines.com/">anynines GmbH</a>
+        </span>
       </div>
-    </div>
   </body>
 </html>
 {{end}}
