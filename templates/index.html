@@ -1,32 +1,30 @@
 {{define "title"}}<title>PostgreSQL Demo</title>{{end}}
 {{define "body"}}
-<div class="container content">
-	<div class="row">
-		<div class="col-lg-9">
-			<div class="page-header">
-				<h1>MyPostgreSQL Test</h1>
-				<div class="actions rAlign">
-					<a href="/blog-posts/new" >New Blog Post</a>
-				</div> <!-- page-header -->
-			</div>
-			<div class="posts">
-					{{range $idx, $blogpost := . }}
-						<div class="post">
-							<div class="title">
-								<h4>Title: {{$blogpost.Title}}</h4>
-							</div>
-							<div class="post-body">
-								{{$blogpost.Description}}
-							</div>
-							<div class="post-footer">
-								<span class="timestamps">
-								</span>
-							</div>
-		     		</div>
-					{{end}}
-				</table>
-			</div> <!-- post -->
-		</div> <!-- col-lg-9 -->
-	</div><!--/row-->
-</div> <!-- /container -->
+
+<div class="page__container">
+
+	<div class="page__header">
+		<h1>Blog</h1>
+		<div class="actions">
+			<a class="btn btn-primary" href="/blog-posts/new" >Create Post</a>
+		</div>
+	</div>
+
+	<div class="page__body">
+		<div class="posts">
+			
+			{{range $idx, $blogpost := . }}
+				<div class="post">
+					<h2>{{$blogpost.Title}}</h2>
+					<div class="post-body">
+						{{$blogpost.Description}}
+					</div>
+				</div>
+			{{end}}
+
+		</div>
+	</div>
+
+</div>
+
 {{end}}
