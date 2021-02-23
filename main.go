@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 
 	_ "github.com/lib/pq"
@@ -228,6 +229,8 @@ func renderBlogPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	log.Println(runtime.Version())
+
 	initTemplates()
 	initDatabase()
 

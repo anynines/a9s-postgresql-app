@@ -1,8 +1,14 @@
-FROM golang:1.15
+FROM golang:1.16
 
 WORKDIR /app
-COPY . /app/
-RUN go get github.com/lib/pq
+COPY go.mod go.mod
+COPY go.sum go.sum
+
+RUN go mod download
+
+COPY main.go main.go
+COPY templates templates
+COPY public public
 
 EXPOSE 3000
 CMD ["go","run","main.go"]
