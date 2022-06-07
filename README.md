@@ -4,7 +4,7 @@ This is a sample app to check whether the a9s PostgreSQL service is working or n
 
 ## Install, push and bind
 
-Make sure you installed GO on your machine, [download this](https://golang.org/doc/install?download=go1.13.darwin-amd64.pkg) for mac.
+Make sure you installed Go on your machine, [download this](https://golang.org/doc/install?download=go1.13.darwin-amd64.pkg) for mac.
 
 Clone the repository
 ```
