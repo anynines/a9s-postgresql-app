@@ -136,6 +136,14 @@ body {
   padding: var(--spacing-lg);
 }
 
+.delete-form {
+  padding: 0;
+}
+
+.delete-form .btn:hover{
+  background-color: red;
+}
+
 h4 {
   font-size: 24px;
   margin: 0;

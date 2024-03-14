@@ -160,11 +160,11 @@ func NewClient() (*sql.DB, error) {
 
 func clearDatabase(w http.ResponseWriter, r *http.Request) {
 	client, err := NewClient()
-	defer client.Close()
 	if err != nil {
 		log.Printf("Failed to create connection: %v", err)
 		return
 	}
+	defer client.Close()
 
 	client.QueryRow(`DELETE FROM posts`)
 	w.Write([]byte("OK"))
@@ -180,11 +180,11 @@ func createBlogPost(w http.ResponseWriter, r *http.Request) {
 
 	// insert key value into service
 	client, err := NewClient()
-	defer client.Close()
 	if err != nil {
 		log.Printf("Failed to create connection: %v", err)
 		return
 	}
+	defer client.Close()
 	var postID int
 	err = client.QueryRow(`INSERT INTO posts(title, description) VALUES('` + title + `', '` + description + `') RETURNING id`).Scan(&postID)
 	if err != nil {
@@ -202,7 +202,6 @@ func renderBlogPosts(w http.ResponseWriter, r *http.Request) {
 	blogposts := make([]BlogPost, 0)
 
 	client, err := NewClient()
-	defer client.Close()
 	if err != nil {
 		log.Printf("Failed to create connection: %v\n", err)
 	} else {
@@ -224,8 +223,35 @@ func renderBlogPosts(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	defer client.Close()
 
 	renderTemplate(w, "index", "base", blogposts)
+}
+
+func deleteBlogPost(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Printf("Failed to parse Form: %v", err)
+		return
+	}
+	postID := r.PostFormValue("postID")
+
+	client, err := NewClient()
+	if err != nil {
+		log.Printf("Failed to create connection: %v", err)
+		return
+	}
+	defer client.Close()
+	_, err = client.Exec(`DELETE FROM posts WHERE id =` + postID + `;`)
+	if err != nil {
+		log.Printf("Failed to delete post entry with ID: %v ; err = %v", postID, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", 303)
+
+	log.Printf("Deleted blog post entry with ID: %v\n", postID)
+
 }
 
 func main() {
@@ -244,6 +270,7 @@ func main() {
 	http.HandleFunc("/", renderBlogPosts)
 	http.HandleFunc("/blog-posts/new", newBlogPost)
 	http.HandleFunc("/blog-posts/create", createBlogPost)
+	http.HandleFunc("/blog-posts/delete", deleteBlogPost)
 	http.HandleFunc("/clear", clearDatabase)
 
 	log.Printf("Listening on :%v\n", port)
