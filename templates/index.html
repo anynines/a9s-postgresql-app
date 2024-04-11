@@ -19,6 +19,17 @@
 					<div class="post-body">
 						{{$blogpost.Description}}
 					</div>
+					<form
+						class="delete-form"
+						id="delete-post-{{$blogpost.ID}}"
+						action="/blog-posts/delete"
+						method="post"
+					>
+					<input type="hidden" name="postID" value="{{$blogpost.ID}}" />
+					<div class="actions">
+						<input class="btn btn-primary" type="submit" value="Delete Post">
+					</div>
+					</form>
 				</div>
 			{{end}}
 
