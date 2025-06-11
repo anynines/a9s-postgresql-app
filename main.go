@@ -125,7 +125,7 @@ func createCredentials() (PostgresqlCredentials, error) {
 	}
 
 	if s.PostgreSQL[0].Credentials.Sslmode == "" {
-		s.PostgreSQL[0].Credentials.Sslmode = "enable"
+		s.PostgreSQL[0].Credentials.Sslmode = "require"
 	}
 
 	return s.PostgreSQL[0].Credentials, nil
