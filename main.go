@@ -27,7 +27,7 @@ type PostgresqlCredentials struct {
 type VCAPServices struct {
 	PostgreSQL []struct {
 		Credentials PostgresqlCredentials `json:"credentials"`
-	} `json:"a9s-postgresql11"`
+	} `json:"a9s-postgresql17-ms-1749548047"`
 }
 
 type BlogPost struct {
