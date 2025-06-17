@@ -10,6 +10,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -17,17 +18,14 @@ import (
 type PostgresqlCredentials struct {
 	Host     string `json:"host"`
 	Username string `json:"username"`
-	Sslmode  string `json:"sslmode"`
 	Password string `json:"password"`
 	Port     int    `json:"port"`
 	Database string `json:"name"`
 }
 
 // struct for reading env
-type VCAPServices struct {
-	PostgreSQL []struct {
-		Credentials PostgresqlCredentials `json:"credentials"`
-	} `json:"a9s-postgresql11"`
+type VCAPServices map[string][]struct {
+	Credentials PostgresqlCredentials `json:"credentials"`
 }
 
 type BlogPost struct {
@@ -92,11 +90,6 @@ func createCredentials() (PostgresqlCredentials, error) {
 			log.Println(err)
 			return PostgresqlCredentials{}, err
 		}
-		sslmode := os.Getenv("POSTGRESQL_SSLMODE")
-		if len(sslmode) < 1 {
-			log.Println("Environment variable POSTGRESQL_SSLMODE missing. Using default of disabled")
-			sslmode = "disable"
-		}
 
 		port, err := strconv.Atoi(portStr)
 		if err != nil {
@@ -107,7 +100,6 @@ func createCredentials() (PostgresqlCredentials, error) {
 		credentials := PostgresqlCredentials{
 			Host:     host,
 			Username: username,
-			Sslmode:  sslmode,
 			Password: password,
 			Port:     port,
 			Database: database,
@@ -117,18 +109,30 @@ func createCredentials() (PostgresqlCredentials, error) {
 
 	// Cloud Foundry
 	// no new read of the env var, the reason is the receiver loop
-	var s VCAPServices
-	err := json.Unmarshal([]byte(os.Getenv("VCAP_SERVICES")), &s)
+	var servicesMap VCAPServices
+	err := json.Unmarshal([]byte(os.Getenv("VCAP_SERVICES")), &servicesMap)
 	if err != nil {
 		log.Println(err)
 		return PostgresqlCredentials{}, err
 	}
 
-	if s.PostgreSQL[0].Credentials.Sslmode == "" {
-		s.PostgreSQL[0].Credentials.Sslmode = "disable"
+	for serviceName, serviceVarList := range servicesMap {
+		if !strings.Contains(serviceName, "a9s-postgresql") {
+			continue
+		}
+		if len(serviceVarList) == 0 {
+			err = fmt.Errorf("empty list of variables for service %v in env variables", serviceName)
+			log.Println(err)
+			return PostgresqlCredentials{}, err
+		}
+		// use the first set of env variables found for postgresql
+		log.Printf("Using creds from env for service: %v ", serviceName)
+		return serviceVarList[0].Credentials, nil
 	}
 
-	return s.PostgreSQL[0].Credentials, nil
+	err = fmt.Errorf("no matching list environment variables found for postgresql service")
+	log.Println(err)
+	return PostgresqlCredentials{}, err
 }
 
 func renderTemplate(w http.ResponseWriter, name string, template string, viewModel interface{}) {
@@ -146,7 +150,7 @@ func NewClient() (*sql.DB, error) {
 		return nil, err
 	}
 
-	connStr := "user=" + credentials.Username + " dbname=" + credentials.Database + " password=" + credentials.Password + " host=" + credentials.Host + " port=" + strconv.Itoa(credentials.Port) + " sslmode=" + credentials.Sslmode
+	connStr := "user=" + credentials.Username + " dbname=" + credentials.Database + " password=" + credentials.Password + " host=" + credentials.Host + " port=" + strconv.Itoa(credentials.Port)
 	credentials.Password = "******"
 	log.Printf("Connection to:\n%v\n", credentials)
 
