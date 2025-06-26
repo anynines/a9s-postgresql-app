@@ -57,44 +57,44 @@ func initDatabase() {
 	client.Exec("CREATE TABLE posts(id SERIAL, title varchar(256), description varchar(1024))")
 }
 
-func createCredentials() (PostgresqlCredentials, error) {
+func createCredentials() (*PostgresqlCredentials, error) {
 	// Kubernetes
 	if os.Getenv("VCAP_SERVICES") == "" {
 		host := os.Getenv("POSTGRESQL_HOST")
 		if len(host) < 1 {
 			err := fmt.Errorf("Environment variable POSTGRESQL_HOST missing.")
 			log.Println(err)
-			return PostgresqlCredentials{}, err
+			return nil, err
 		}
 		username := os.Getenv("POSTGRESQL_USERNAME")
 		if len(username) < 1 {
 			err := fmt.Errorf("Environment variable POSTGRESQL_USERNAME missing.")
 			log.Println(err)
-			return PostgresqlCredentials{}, err
+			return nil, err
 		}
 		password := os.Getenv("POSTGRESQL_PASSWORD")
 		if len(password) < 1 {
 			err := fmt.Errorf("Environment variable POSTGRESQL_PASSWORD missing.")
 			log.Println(err)
-			return PostgresqlCredentials{}, err
+			return nil, err
 		}
 		portStr := os.Getenv("POSTGRESQL_PORT")
 		if len(portStr) < 1 {
 			err := fmt.Errorf("Environment variable POSTGRESQL_PORT missing.")
 			log.Println(err)
-			return PostgresqlCredentials{}, err
+			return nil, err
 		}
 		database := os.Getenv("POSTGRESQL_DATABASE")
 		if len(database) < 1 {
 			err := fmt.Errorf("Environment variable POSTGRESQL_DATABASE missing.")
 			log.Println(err)
-			return PostgresqlCredentials{}, err
+			return nil, err
 		}
 
 		port, err := strconv.Atoi(portStr)
 		if err != nil {
 			log.Println(err)
-			return PostgresqlCredentials{}, err
+			return nil, err
 		}
 
 		credentials := PostgresqlCredentials{
@@ -104,7 +104,7 @@ func createCredentials() (PostgresqlCredentials, error) {
 			Port:     port,
 			Database: database,
 		}
-		return credentials, nil
+		return &credentials, nil
 	}
 
 	// Cloud Foundry
@@ -113,7 +113,7 @@ func createCredentials() (PostgresqlCredentials, error) {
 	err := json.Unmarshal([]byte(os.Getenv("VCAP_SERVICES")), &servicesMap)
 	if err != nil {
 		log.Println(err)
-		return PostgresqlCredentials{}, err
+		return nil, err
 	}
 
 	for serviceName, serviceVarList := range servicesMap {
@@ -123,16 +123,16 @@ func createCredentials() (PostgresqlCredentials, error) {
 		if len(serviceVarList) == 0 {
 			err = fmt.Errorf("empty list of variables for service %v in env variables", serviceName)
 			log.Println(err)
-			return PostgresqlCredentials{}, err
+			return nil, err
 		}
 		// use the first set of env variables found for postgresql
 		log.Printf("Using creds from env for service: %v ", serviceName)
-		return serviceVarList[0].Credentials, nil
+		return &serviceVarList[0].Credentials, nil
 	}
 
 	err = fmt.Errorf("no matching list environment variables found for postgresql service")
 	log.Println(err)
-	return PostgresqlCredentials{}, err
+	return nil, err
 }
 
 func renderTemplate(w http.ResponseWriter, name string, template string, viewModel interface{}) {
@@ -150,7 +150,7 @@ func NewClient() (*sql.DB, error) {
 		return nil, err
 	}
 
-	connStr := "user=" + credentials.Username + " dbname=" + credentials.Database + " password=" + credentials.Password + " host=" + credentials.Host + " port=" + strconv.Itoa(credentials.Port)
+	connStr := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s", credentials.Username, credentials.Database, credentials.Password, credentials.Host, strconv.Itoa(credentials.Port))
 	credentials.Password = "******"
 	log.Printf("Connection to:\n%v\n", credentials)
 
